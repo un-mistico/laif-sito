@@ -1,0 +1,11 @@
+{
+  "name": "LAIF homepage",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Anteprima LAIF",
+      "onAutoForward": "openPreview"
+    }
+  }
+}
