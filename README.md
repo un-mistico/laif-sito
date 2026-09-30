@@ -54,9 +54,13 @@ Evita che due agenti riscrivano contemporaneamente l'intera pagina. Se le modifi
 
 ## Anteprima condivisa del team
 
-L'anteprima locale e quella del proprio Codespace sono già predisposte. Un indirizzo web stabile, accessibile a tutti e tre, richiede un servizio di hosting da collegare e autorizzare separatamente. Non rendere pubblica la porta del Codespace per aggirare questo passaggio.
+La homepage è pubblicata su GitHub Pages: https://un-mistico.github.io/laif-sito/
 
-Il progetto è statico: il servizio dovrà pubblicare la cartella `site`, senza comando di build. Eventuali anteprime automatiche per le Pull Request si potranno attivare dopo aver scelto servizio, accessi e costi. GitHub Pages e Vercel non vengono attivati da questa configurazione.
+Le modifiche integrate nel branch `main` aggiornano automaticamente il sito dopo il completamento della pubblicazione. I file da modificare sono nella cartella `site`; il file `index.html` nella radice porta alla homepage. Non occorre un backend o un account Vercel.
+
+Per aggiungere i colleghi, il proprietario apre https://github.com/un-mistico/laif-sito/settings/access e usa **Add people**. Ogni collega deve accettare il proprio invito.
+
+Le Pull Request non generano anteprime pubbliche separate: per rivederle usa l’anteprima locale o il Codespace.
 
 ## Stato della bozza
 
