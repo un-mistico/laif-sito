@@ -13,6 +13,8 @@ Ultimo aggiornamento: 7 ottobre 2026.
 | URL dismesse | Redirect 301 dalle vecchie URL verso la pagina più vicina. Nessuna URL indicizzata deve finire in 404. |
 | Lingue | Contenuti in italiano e inglese, con URL separate (`/en/...`). |
 | Form | Form collegati a un tool di automazione ancora da scegliere. Il sito resta statico: il form invia a un webhook/endpoint del tool. |
+| Formato | Pagine HTML statiche, scritte direttamente in HTML: ogni testo, fatto, FAQ e link è nel sorgente della pagina, leggibile da motori di ricerca e crawler AI senza eseguire JavaScript. |
+| JavaScript | Solo miglioramento progressivo (animazioni, scrollytelling, interazioni). Disattivandolo, nessun contenuto deve sparire. |
 | Dipendenze | Nessun framework o build obbligatoria, salvo decisione esplicita. |
 
 ## 2. Infrastruttura AWS
@@ -46,7 +48,10 @@ Requisiti per non perdere il posizionamento del sito attuale:
 - `sitemap.xml` con tutte le pagine indicizzabili, `lastmod` reale e alternative linguistiche; dichiarata in `robots.txt` e inviata a Search Console.
 - Title e meta description per ogni pagina. Template proposto per le pagine core: `{Soluzione}: {beneficio concreto} | LAIF`, entro 60 caratteri; meta description di 140–155 caratteri.
 - Open Graph e Twitter card per la condivisione.
-- Un solo `<h1>` per pagina; contenuti principali presenti nell'HTML, non generati da JavaScript.
+- Un solo `<h1>` per pagina e gerarchia di titoli coerente (`h2`, `h3`).
+- HTML semantico: `header`, `nav`, `main`, `section`, `article`, `footer`; link reali `<a href>` tra le pagine; FAQ in `<details>`/`<summary>` (contenuto comunque nel sorgente).
+- Verifica prima di ogni rilascio: con JavaScript disattivato (o con `curl`) la pagina mostra tutti i testi e i link.
+- Elementi generati dallo script nella bozza attuale, da tenere solo decorativi: parole rotanti dell'hero (coperte dall'`aria-label` dell'`h1`), tasti della tastiera SVG, didascalia del computer (i testi delle fasi sono già nell'HTML).
 - Privacy policy e cookie policy sempre online (obbligo legale), possibilmente alle URL attuali `/privacy-policy/` e `/cookies/`.
 
 ## 4. Struttura URL proposta (da validare)
