@@ -46,6 +46,7 @@ Evita che due agenti riscrivano contemporaneamente l'intera pagina. Se le modifi
 | `site/styles.css` | Colori, font, layout, adattamento mobile, transizioni |
 | `site/script.js` | Rotazione del titolo, fasi del computer, pausa animazioni |
 | `NOTE-DESIGN.md` | Scelte della bozza e contenuti da completare |
+| `PRODUZIONE.md` | Decisioni tecniche (S3/CloudFront, SEO, GEO) e checklist per andare in produzione |
 | `AGENTS.md` | Istruzioni comuni per chi usa un agente AI |
 
 ## Prompt di partenza per il proprio assistente
