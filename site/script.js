@@ -7,7 +7,7 @@ if('IntersectionObserver' in window){const observer=new IntersectionObserver(ent
  const controls=[...document.querySelectorAll('[data-filter-group]')];
  if(!controls.length)return;
  const params=new URLSearchParams(location.search), selected={service:params.get('servizio')||'Tutti',industry:'Tutti',kind:'Tutti'},cards=[...document.querySelectorAll('.work-card[data-industry]')],status=document.getElementById('filter-status'),empty=document.getElementById('empty-results');
- function update(){let count=0;cards.forEach(card=>{card.hidden=(selected.service!=='Tutti'&&!(card.dataset.services||card.dataset.category).split(' ').includes(selected.service))||(selected.industry!=='Tutti'&&card.dataset.industry!==selected.industry)||(selected.kind!=='Tutti'&&(card.dataset.kind||'concept')!==selected.kind);if(!card.hidden)count++});controls.forEach(button=>button.setAttribute('aria-pressed',String(selected[button.dataset.filterGroup]===button.dataset.filter)));const real=cards.filter(c=>!c.hidden&&c.dataset.kind==='real').length;status.textContent=count+' lavori: '+real+' progetti reali e '+(count-real)+' concept';empty.hidden=count!==0;}
+ function update(){let count=0;cards.forEach(card=>{card.hidden=(selected.service!=='Tutti'&&!(card.dataset.services||card.dataset.category).split(' ').includes(selected.service))||(selected.industry!=='Tutti'&&card.dataset.industry!==selected.industry)||(selected.kind!=='Tutti'&&(card.dataset.kind||'concept')!==selected.kind);if(!card.hidden)count++});controls.forEach(button=>button.setAttribute('aria-pressed',String(selected[button.dataset.filterGroup]===button.dataset.filter)));status.textContent=count===1?'1 progetto reale':count+' progetti reali';empty.hidden=count!==0;}
  controls.forEach(button=>button.addEventListener('click',()=>{selected[button.dataset.filterGroup]=button.dataset.filter;update()}));update();
 })();
   (() => {
@@ -84,10 +84,10 @@ if('IntersectionObserver' in window){const observer=new IntersectionObserver(ent
 
 /* Contact prototype: memory only; no backend or external submission. */
 (() => {
- const triggers=[...document.querySelectorAll('a.cta[href="mailto:info@laifgroup.com"]')];
+ const triggers=[...document.querySelectorAll('a.cta[href="mailto:info@laifgroup.com"], a[data-contact-path]')];
  if(!triggers.length)return;
  const dialog=document.createElement('dialog');dialog.className='contact-dialog';dialog.setAttribute('aria-labelledby','contact-title');
- dialog.innerHTML='<div class="contact-shell"><div class="contact-top"><span class="contact-logo">LAIF</span><button class="contact-close" type="button" aria-label="Chiudi il modulo">Chiudi <span aria-hidden="true">×</span></button></div><p class="contact-demo"><b>Versione di prova.</b> I dati inseriti non vengono salvati né inviati.</p><div class="contact-content" tabindex="-1"></div><div class="contact-bottom"><a href="mailto:info@laifgroup.com">info@laifgroup.com</a><a href="https://laifgroup.com/privacy-policy" target="_blank" rel="noopener">Informativa privacy</a></div></div>';
+ dialog.innerHTML='<div class="contact-shell"><div class="contact-top"><span class="contact-logo">LAIF</span><button class="contact-close" type="button" aria-label="Chiudi il modulo">Chiudi <span aria-hidden="true">×</span></button></div><p class="contact-demo"><b>Versione di prova.</b> I dati inseriti non vengono salvati né inviati.</p><div class="contact-content" tabindex="-1"></div><div class="contact-bottom"><a href="mailto:info@laifgroup.com">info@laifgroup.com</a><a href="'+(document.querySelector('footer a[href*="privacy-policy"]')?.getAttribute('href')||'privacy-policy/index.html')+'">Informativa privacy</a></div></div>';
  document.body.append(dialog);
  const logo=document.querySelector('header .logo-window');if(logo)dialog.querySelector('.contact-logo').replaceChildren(logo.cloneNode(true));
  const content=dialog.querySelector('.contact-content');let step='start',answers={},opener;
@@ -108,10 +108,30 @@ if('IntersectionObserver' in window){const observer=new IntersectionObserver(ent
   content.querySelector('#contact-title').focus({preventScroll:true});dialog.scrollTop=0;
  }
  content.addEventListener('click',ev=>{const path=ev.target.closest('[data-path]');if(path){step=path.dataset.path;render()}if(ev.target.closest('[data-back]')){remember();step='start';render()}if(ev.target.closest('[data-edit]')){step='project';render()}if(ev.target.closest('[data-close]'))dialog.close()});
- function open(trigger){if(dialog.open)return;opener=trigger||document.activeElement;answers={};step='start';document.documentElement.classList.add('contact-open');dialog.showModal();render()}
+ function open(trigger){if(dialog.open)return;opener=trigger||document.activeElement;answers={};step=trigger?.dataset?.contactPath||(location.hash==='#lavora-con-noi'?'work':'start');document.documentElement.classList.add('contact-open');dialog.showModal();render()}
  dialog.querySelector('.contact-close').addEventListener('click',()=>dialog.close());
- dialog.addEventListener('close',()=>{answers={};content.replaceChildren();document.documentElement.classList.remove('contact-open');if(location.hash==='#parliamoci')history.replaceState(null,'',location.pathname+location.search);opener?.focus({preventScroll:true})});
+ dialog.addEventListener('close',()=>{answers={};content.replaceChildren();document.documentElement.classList.remove('contact-open');if((location.hash==='#parliamoci'||location.hash==='#lavora-con-noi'))history.replaceState(null,'',location.pathname+location.search);opener?.focus({preventScroll:true})});
  triggers.forEach(t=>{t.setAttribute('aria-haspopup','dialog');t.addEventListener('click',ev=>{ev.preventDefault();open(t)})});
- window.addEventListener('hashchange',()=>{if(location.hash==='#parliamoci')open();else if(dialog.open)dialog.close()});
- if(location.hash==='#parliamoci')open();
+ window.addEventListener('hashchange',()=>{if((location.hash==='#parliamoci'||location.hash==='#lavora-con-noi'))open();else if(dialog.open)dialog.close()});
+ if((location.hash==='#parliamoci'||location.hash==='#lavora-con-noi'))open();
+})();
+
+(() => {
+  document.addEventListener('click', e => {
+    const link = e.target.closest('[data-embed]');
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    const frame = document.createElement('iframe');
+    frame.src = link.dataset.embed;
+    frame.title = link.getAttribute('aria-label') || 'Video';
+    frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    frame.allowFullscreen = true;
+    frame.loading = 'lazy';
+    const box = document.createElement('div');
+    box.className = 'video-embed video-embed-' + (link.dataset.embedKind || 'youtube');
+    box.appendChild(frame);
+    const thumb = link.querySelector('.value-video-thumb');
+    if (thumb) { thumb.replaceWith(box); link.removeAttribute('data-embed'); link.addEventListener('click', ev => ev.preventDefault()); }
+    else link.replaceWith(box);
+  });
 })();
