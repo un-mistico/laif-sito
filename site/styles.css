@@ -372,3 +372,6 @@ footer .logo-window[class]{width:150px}
 @media(max-width:380px){.project-categories{gap:15px}.project-category{font-size:17px;gap:3px}}
 @media(prefers-reduced-motion:reduce){.project-category{transition:none}}
 .project-category:focus-visible{outline-offset:-2px}
+
+/* Service titles keep the same typeface while using the brand accent. */
+.service-copy :is(h2,h3) em,.service-projects>h3 em{font:inherit;font-style:normal;color:var(--accent)}
