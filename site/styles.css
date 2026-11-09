@@ -375,3 +375,11 @@ footer .logo-window[class]{width:150px}
 
 /* Service titles keep the same typeface while using the brand accent. */
 .service-copy :is(h2,h3) em,.service-projects>h3 em{font:inherit;font-style:normal;color:var(--accent)}
+
+/* Application steps in the full-screen contact dialog. */
+[data-careers] [hidden]{display:none}
+.career-roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:.5rem 1.5rem}
+.career-roles label,.career-docs label{display:block;padding:.65rem 0;line-height:1.45}
+.career-roles input,.career-docs input[type=checkbox]{width:1.15rem;height:1.15rem;accent-color:var(--accent);margin-right:.65rem;vertical-align:middle}
+.career-docs input[type=file]{display:block;margin:.75rem 0 1rem;max-width:100%;font:inherit}
+.career-docs a{color:var(--accent);text-decoration:underline}

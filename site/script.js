@@ -96,7 +96,19 @@ if('IntersectionObserver' in window){const observer=new IntersectionObserver(ent
  document.body.appendChild(dialog);
  const brand=document.querySelector('header .logo-window');if(brand)dialog.querySelector('.contact-logo').replaceChildren(brand.cloneNode(true));
  const content=dialog.querySelector('.contact-content'),progress=dialog.querySelector('[role="progressbar"]'),bar=progress.querySelector('span');
- const audiences=[['azienda','Per la mia azienda'],['cliente','Per un mio cliente'],['collaborazione','Collaborazioni o candidature'],['personale','Per un progetto personale']];
+ const careersScript=new URL('careers.js',document.currentScript.src).href;
+ let careersReady;
+ function loadCareers(){
+  if(!careersReady)careersReady=new Promise((resolve,reject)=>{
+   const script=document.createElement('script');
+   script.src=careersScript;
+   script.onload=resolve;
+   script.onerror=()=>{careersReady=null;script.remove();reject()};
+   document.head.append(script);
+  });
+  return careersReady;
+ }
+ const audiences=[['azienda','Per la mia azienda'],['cliente','Per un mio cliente'],['collaborazione','Collaborazioni e candidature']];
  const needs=[['software','Software su misura'],['ai','Intelligenza artificiale'],['dati','Dati e integrazioni'],['cloud','Cloud e infrastrutture'],['insieme','Capiamolo insieme']];
  let step=0,answers={},opener=null,timer=null,rapid=false,mcpReturnStep=0;
  const clearTimer=()=>{if(timer!==null){clearTimeout(timer);timer=null}};
@@ -124,26 +136,26 @@ const mcpPanel=()=>'<p class="mcp-preview-state">Connettore MCP · Disponibile p
   if(!terminal)body='<p class="contact-count">'+(rapid?'Solo i tuoi recapiti':String(step+1).padStart(2,'0')+' / 04')+'</p><form novalidate>'+body+'</form>';
   if(step===0)body+='<div class="contact-secondary-paths"><div class="contact-mcp-teaser"><span aria-hidden="true">✳</span><p>Hai un tuo chatbot AI?<button type="button" class="contact-mcp-link" data-contact-mcp>Esplora il tuo progetto con il connettore MCP di LAIF</button></p></div></div>';
   if(step==='mcp')body=mcpPanel();
-  if(step==='personale')body='<span class="contact-outcome" aria-hidden="true">✳</span>'+heading('Lavoriamo con le aziende.','Per ora ci concentriamo su software, dati e AI per le aziende. Per questo non ti chiediamo altri dati per un progetto personale.')+'<div class="contact-actions"><button class="contact-back" type="button" data-contact-start>Rivedi la risposta</button><button class="cta" type="button" data-contact-close>Chiudi</button></div>';
-  if(step==='collaborazione')body='<span class="contact-outcome" aria-hidden="true">✳</span>'+heading('Scrivici direttamente.','Per collaborazioni e candidature puoi scriverci direttamente. Questo percorso è dedicato ai progetti per le aziende.')+'<a class="footer-email" href="mailto:info@laifgroup.com">info@laifgroup.com</a><div class="contact-actions"><button class="contact-back" type="button" data-contact-start>Rivedi la risposta</button><button class="cta" type="button" data-contact-close>Chiudi</button></div>';
-  if(step==='riepilogo')body='<span class="contact-outcome" aria-hidden="true">✓</span>'+heading('Ci siamo. Questo è il riepilogo.','Controlla i dettagli e apri la tua email per inviarli al team LAIF.')+'<dl class="contact-summary"><div><dt>Per chi scrivi</dt><dd data-answer="audience"></dd></div><div><dt>Di cosa hai bisogno</dt><dd data-answer="need"></dd></div><div><dt>Nome</dt><dd data-answer="name"></dd></div><div><dt>Email</dt><dd data-answer="email"></dd></div><div><dt>Azienda</dt><dd data-answer="company"></dd></div><div><dt>Telefono</dt><dd data-answer="phone"></dd></div><div class="wide"><dt>Il progetto</dt><dd data-answer="brief"></dd></div></dl><div class="contact-actions"><button class="contact-back" type="button" data-contact-edit>Modifica le risposte</button><a class="cta" data-contact-email>Apri email e invia il riepilogo</a></div>';
+  if(step==='collaborazione')body=heading('Lavora con noi.','La tua candidatura')+'<div data-careers></div>';
+  if(step==='riepilogo')body='<span class="contact-outcome" aria-hidden="true">✓</span>'+heading('Ci siamo. Questo è il riepilogo.','Qui puoi rileggere le tue risposte.')+'<dl class="contact-summary"><div><dt>Per chi scrivi</dt><dd data-answer="audience"></dd></div><div><dt>Di cosa hai bisogno</dt><dd data-answer="need"></dd></div><div><dt>Nome</dt><dd data-answer="name"></dd></div><div><dt>Email</dt><dd data-answer="email"></dd></div><div><dt>Azienda</dt><dd data-answer="company"></dd></div><div><dt>Telefono</dt><dd data-answer="phone"></dd></div><div class="wide"><dt>Il progetto</dt><dd data-answer="brief"></dd></div></dl><div class="contact-actions"><button class="contact-back" type="button" data-contact-edit>Modifica le risposte</button></div>';
   content.innerHTML=body;
+  if(step==='collaborazione'){
+   const mount=content.querySelector('[data-careers]');
+   loadCareers().then(()=>{
+    if(mount.isConnected)window.mountLaifCareers(mount,dialog.querySelector('.contact-bottom > a').href,()=>{step=0;render()});
+   }).catch(()=>{mount.innerHTML='<a href="https://laifgroup.com/lavora-con-noi/">Apri il modulo candidature LAIF</a>'});
+  }
   const form=content.querySelector('form');
   if(form){for(const input of form.querySelectorAll('input,textarea')){if(input.type==='radio')input.checked=answers[input.name]===input.value;else input.value=answers[input.name]||''}form.addEventListener('submit',event=>{event.preventDefault();next()});form.addEventListener('change',event=>{if(event.target.type==='radio')remember()});form.addEventListener('click',event=>{if(event.target.type==='radio'&&event.detail>0){remember();clearTimer();timer=setTimeout(next,220)}})}
   if(step==='mcp')content.querySelector('#mcp-project-prompt').value=mcpPrompt;
   if(step==='riepilogo')for(const item of content.querySelectorAll('[data-answer]')){let value=answers[item.dataset.answer];if(item.dataset.answer==='audience')value=audiences.find(a=>a[0]===value)?.[1];if(item.dataset.answer==='need')value=needs.find(a=>a[0]===value)?.[1];item.textContent=value?.trim()||'Da definire insieme'}
-  if(step==='riepilogo'){
-   const labels={audience:'Per chi scrivi',need:'Di cosa hai bisogno',name:'Nome',email:'Email',company:'Azienda',phone:'Telefono',brief:'Il progetto'};
-   const text=[...content.querySelectorAll('[data-answer]')].map(item=>labels[item.dataset.answer]+': '+item.textContent).join('\n');
-   content.querySelector('[data-contact-email]').href='mailto:info@laifgroup.com?subject='+encodeURIComponent('Un nuovo progetto con LAIF')+'&body='+encodeURIComponent(text);
-  }
   focusTitle();
  }
  function next(){
   clearTimer();remember();const error=content.querySelector('#contact-error');
   if(step===0&&!answers.audience){error.textContent='Scegli per chi ci scrivi.';content.querySelector('input').focus();return}
   if(step===1&&!answers.need){error.textContent='Scegli un punto di partenza, anche «Capiamolo insieme».';content.querySelector('input').focus();return}
-  if(step===0&&['personale','collaborazione'].includes(answers.audience)){step=answers.audience;render();return}
+  if(step===0&&answers.audience==='collaborazione'){step=answers.audience;render();return}
   if(step===3){const form=content.querySelector('form');for(const key of ['name','email']){const field=form.elements[key];field.removeAttribute('aria-invalid');if(!field.value.trim()||!field.validity.valid){field.setAttribute('aria-invalid','true');error.textContent=key==='email'?'Inserisci un indirizzo email valido.':key==='name'?'Inserisci il tuo nome.':'Inserisci il nome dell’azienda.';field.focus();return}}step='riepilogo'}else step++;
   render();
  }
@@ -152,7 +164,7 @@ const mcpPanel=()=>'<p class="mcp-preview-state">Connettore MCP · Disponibile p
  dialog.querySelector('.contact-close').addEventListener('click',close);
  content.addEventListener('click',event=>{if(event.target.closest('[data-contact-quick]')){clearTimer();remember();rapid=true;step=3;render();return}if(event.target.closest('[data-contact-mcp]')){clearTimer();remember();mcpReturnStep=step;step='mcp';render();return}if(event.target.closest('[data-mcp-back]')){step=mcpReturnStep;render();content.querySelector('[data-contact-mcp]')?.focus();return}if(event.target.closest('[data-copy-prompt]')){const field=content.querySelector('#mcp-project-prompt'),status=content.querySelector('.mcp-copy-status');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(field.value).then(()=>{status.textContent='Traccia copiata. Puoi incollarla nel tuo chatbot.'}).catch(()=>{field.select();status.textContent='Seleziona e copia la traccia.'});else{field.select();status.textContent='Seleziona e copia la traccia.'}return}if(event.target.closest('[data-contact-close]'))close();if(event.target.closest('[data-contact-back]')){remember();step=rapid?0:Math.max(0,step-1);rapid=false;render()}if(event.target.closest('[data-contact-start]')){answers={};step=0;render()}if(event.target.closest('[data-contact-edit]')){step=3;render()}});
  dialog.addEventListener('close',()=>{clearTimer();answers={};content.replaceChildren();document.documentElement.classList.remove('contact-open');if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi')history.replaceState(null,'',location.pathname+location.search);opener?.focus({preventScroll:true})});
- dialog.addEventListener('keydown',event=>{if(!['INPUT','TEXTAREA','BUTTON','A'].includes(event.target.tagName)&&/^[a-e]$/i.test(event.key)){const inputs=[...content.querySelectorAll('input[type="radio"]')],input=inputs[event.key.toLowerCase().charCodeAt(0)-97];if(input){event.preventDefault();input.click();next()}}});
+ dialog.addEventListener('keydown',event=>{if((step===0||step===1)&&!['INPUT','TEXTAREA','BUTTON','A'].includes(event.target.tagName)&&/^[a-e]$/i.test(event.key)){const inputs=[...content.querySelectorAll('input[type="radio"]')],input=inputs[event.key.toLowerCase().charCodeAt(0)-97];if(input){event.preventDefault();input.click();next()}}});
  triggers.forEach(trigger=>{trigger.setAttribute('aria-haspopup','dialog');trigger.addEventListener('click',event=>{event.preventDefault();open(trigger)})});
  window.addEventListener('hashchange',()=>{if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi')open();else if(dialog.open)close()});
  if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi')open();
