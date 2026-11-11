@@ -96,7 +96,7 @@ if('IntersectionObserver' in window){const observer=new IntersectionObserver(ent
  document.body.appendChild(dialog);
  const brand=document.querySelector('header .logo-window');if(brand)dialog.querySelector('.contact-logo').replaceChildren(brand.cloneNode(true));
  const content=dialog.querySelector('.contact-content'),progress=dialog.querySelector('[role="progressbar"]'),bar=progress.querySelector('span');
- const careersScript=new URL('careers.js?v=202611111540',document.currentScript.src).href;
+ const careersScript=new URL('careers.js?v=202611111559',document.currentScript.src).href;
  let careersReady;
  function loadCareers(){
   if(!careersReady)careersReady=new Promise((resolve,reject)=>{
@@ -172,7 +172,8 @@ const mcpPanel=()=>''+(window.LAIF_WOLICO?'':'<p class="mcp-preview-state">Dispo
 (() => {
   document.addEventListener('click', e => {
     const link = e.target.closest('[data-embed]');
-    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || !(window.LaifConsenso&&window.LaifConsenso.marketing())) return;
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    if (!(window.LaifConsenso&&window.LaifConsenso.marketing())) { if (window.LaifConsenso) { e.preventDefault(); window.LaifConsenso.chiediVideo(link); } return; }
     e.preventDefault();
     const frame = document.createElement('iframe');
     frame.src = link.dataset.embed;

@@ -28,4 +28,7 @@
 .consenso-incorporato .consenso-btn{flex:none;color:var(--ink,#f4f7f8);border:1px solid var(--accent,#51e0ef)}
 .consenso-incorporato a{color:var(--ink,#f4f7f8);font-size:14px}
 iframe[data-consenso-src]:not([src]){display:none}
+/* Sopra i video di YouTube (16:9) e al posto dell'anteprima di «Guarda il video». */
+.video-embed>.consenso-incorporato{position:absolute;inset:0;z-index:1;min-height:0}
+.consenso-incorporato.consenso-video{aspect-ratio:16/9;max-width:760px;height:auto;margin:0 auto 6px}
 @media (max-width:560px){.consenso-banner{left:8px;right:8px;bottom:8px;padding:20px 16px 16px}.consenso-azioni .consenso-btn{flex:1 1 100%}}
