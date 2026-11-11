@@ -1,0 +1,31 @@
+/* Banner cookie di LAIF: usa i colori del sito (variabili di styles.css), con valori di riserva. */
+.consenso-banner,.consenso-pref{--c-bg:var(--dark,#17232b);--c-ink:var(--ink,#f4f7f8);--c-muted:var(--muted,#9fb0b7);--c-line:var(--line,#34434c);--c-accent:var(--accent,#51e0ef);color:var(--c-ink);font:inherit}
+.consenso-banner{position:fixed;z-index:1000;left:16px;right:16px;bottom:16px;max-width:760px;margin:0 auto;padding:24px 24px 20px;background:var(--c-bg);border:1px solid var(--c-line);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.consenso-banner h2,.consenso-pref h2{font-size:20px;letter-spacing:-.01em;margin:0 0 10px;padding-right:32px}
+.consenso-banner p,.consenso-pref p{font-size:14px;line-height:1.6;color:var(--c-muted);margin:0 0 16px}
+.consenso-banner a,.consenso-pref a{color:var(--c-ink)}
+.consenso-x{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;background:none;color:var(--c-ink);font-size:24px;line-height:1;cursor:pointer}
+.consenso-azioni{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+/* «Rifiuta tutti» e «Accetta tutti» hanno lo stesso aspetto: nessuna delle due scelte è spinta. */
+.consenso-btn{min-height:44px;padding:10px 18px;border:1px solid var(--c-accent);background:transparent;color:var(--c-ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.consenso-btn:hover,.consenso-btn:focus-visible{background:var(--c-accent);color:#13232b}
+.consenso-btn-testo{border-color:var(--c-line)}
+.consenso-azioni .consenso-btn{flex:1 1 150px}
+.consenso-pref{max-width:640px;width:calc(100% - 32px);padding:28px;background:var(--c-bg);border:1px solid var(--c-line)}
+.consenso-pref::backdrop{background:rgba(5,12,16,.7)}
+.consenso-pref form{position:relative}
+.consenso-pref .consenso-x{top:-14px;right:-14px}
+.consenso-categoria{border-top:1px solid var(--c-line);padding:14px 0 2px}
+.consenso-categoria label{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px;cursor:pointer}
+.consenso-categoria input{width:20px;height:20px;accent-color:var(--c-accent)}
+.consenso-categoria small{font-weight:400;color:var(--c-muted);margin-left:6px}
+.consenso-categoria p{margin:6px 0 10px 30px}
+.consenso-categoria p small{display:block;margin:4px 0 0}
+.consenso-stato{border-top:1px solid var(--c-line);padding-top:12px;font-size:12px!important;word-break:break-all}
+/* Il riquadro sta anche dentro le card bianche dei post (.video-embed): fondo scuro suo, e ne occupa l'altezza. */
+.consenso-incorporato{box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px;min-height:220px;height:100%;padding:24px;margin:0;background:var(--dark,#17232b);border:1px dashed var(--line,#34434c);color:var(--muted,#9fb0b7)}
+.consenso-incorporato p{margin:0;font-size:14px;line-height:1.6}
+.consenso-incorporato .consenso-btn{flex:none;color:var(--ink,#f4f7f8);border:1px solid var(--accent,#51e0ef)}
+.consenso-incorporato a{color:var(--ink,#f4f7f8);font-size:14px}
+iframe[data-consenso-src]:not([src]){display:none}
+@media (max-width:560px){.consenso-banner{left:8px;right:8px;bottom:8px;padding:20px 16px 16px}.consenso-azioni .consenso-btn{flex:1 1 100%}}

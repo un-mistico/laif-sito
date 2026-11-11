@@ -92,11 +92,11 @@ if('IntersectionObserver' in window){const observer=new IntersectionObserver(ent
  const triggers=[...document.querySelectorAll('a.cta[href="mailto:info@laifgroup.com"], a[data-contact-path]')];
  if(!triggers.length)return;
  const dialog=document.createElement('dialog');dialog.className='contact-dialog';dialog.setAttribute('aria-labelledby','contact-title');
- dialog.innerHTML='<div class="contact-shell"><div class="contact-top"><span class="contact-logo" aria-label="LAIF">LAIF</span><button class="contact-close" type="button" aria-label="Close the form">Close <span aria-hidden="true">×</span></button></div><div class="contact-progress" role="progressbar" aria-label="Contact progress" aria-valuemin="1" aria-valuemax="4"><span></span></div><div class="contact-content" tabindex="-1"></div><div class="contact-bottom"><span><a href="mailto:info@laifgroup.com">info@laifgroup.com</a></span><a href="'+(document.querySelector('footer a[href*="privacy-policy"]')?.getAttribute('href')||'privacy-policy/index.html')+'">Privacy notice</a></div></div>';
+ dialog.innerHTML='<div class="contact-shell"><div class="contact-top"><span class="contact-logo" aria-label="LAIF">LAIF</span><button class="contact-close" type="button" aria-label="Close the form">Close <span aria-hidden="true">×</span></button></div><div class="contact-progress" role="progressbar" aria-label="Contact progress" aria-valuemin="1" aria-valuemax="4"><span></span></div><div class="contact-content" tabindex="-1"></div><div class="contact-bottom"><span><a href="mailto:info@laifgroup.com">info@laifgroup.com</a></span><span class="contact-legal"><a href="'+(document.querySelector('footer a[href*="politica-sicurezza"]')?.getAttribute('href')||'#')+'" target="_blank" rel="noopener">ISO/IEC 27001 and ISO 9001 certified</a><a href="'+(document.querySelector('footer a[href*="cookie-policy"]')?.getAttribute('href')||'cookie-policy/index.html')+'">Cookie policy</a><a href="#preferenze-cookie" data-consenso-apri>Cookie preferences</a></span><a href="'+(document.querySelector('footer a[href*="privacy-policy"]')?.getAttribute('href')||'privacy-policy/index.html')+'">Privacy notice</a></div></div>';
  document.body.appendChild(dialog);
  const brand=document.querySelector('header .logo-window');if(brand)dialog.querySelector('.contact-logo').replaceChildren(brand.cloneNode(true));
  const content=dialog.querySelector('.contact-content'),progress=dialog.querySelector('[role="progressbar"]'),bar=progress.querySelector('span');
- const careersScript=new URL('careers.js',document.currentScript.src).href;
+ const careersScript=new URL('careers.js?v=202611111540',document.currentScript.src).href;
  let careersReady;
  function loadCareers(){
   if(!careersReady)careersReady=new Promise((resolve,reject)=>{
@@ -137,7 +137,7 @@ const mcpPanel=()=>'<p class="mcp-preview-state">MCP connector · Coming soon</p
   if(step===0)body+='<div class="contact-secondary-paths"><div class="contact-mcp-teaser"><span aria-hidden="true">✳</span><p>Do you use an AI chatbot?<button type="button" class="contact-mcp-link" data-contact-mcp>Explore your project with the LAIF MCP connector</button></p></div></div>';
   if(step==='mcp')body=mcpPanel();
   if(step==='collaborazione')body=heading('Work with us.','Your application')+'<div data-careers></div>';
-  if(step==='riepilogo')body='<span class="contact-outcome" aria-hidden="true">✓</span>'+heading('Here we are. This is your summary.','You can review your answers here.')+'<dl class="contact-summary"><div><dt>Writing for</dt><dd data-answer="audience"></dd></div><div><dt>What you need</dt><dd data-answer="need"></dd></div><div><dt>Name</dt><dd data-answer="name"></dd></div><div><dt>Email</dt><dd data-answer="email"></dd></div><div><dt>Company</dt><dd data-answer="company"></dd></div><div><dt>Phone</dt><dd data-answer="phone"></dd></div><div class="wide"><dt>The project</dt><dd data-answer="brief"></dd></div></dl><div class="contact-actions"><button class="contact-back" type="button" data-contact-edit>Edit your answers</button></div>';
+  if(step==='riepilogo')body='<span class="contact-outcome" aria-hidden="true">✓</span>'+heading('Here we are. This is your summary.',(window.LAIF_WOLICO?'Check your answers and send them to the LAIF team.':'You can review your answers here.'))+'<dl class="contact-summary"><div><dt>Writing for</dt><dd data-answer="audience"></dd></div><div><dt>What you need</dt><dd data-answer="need"></dd></div><div><dt>Name</dt><dd data-answer="name"></dd></div><div><dt>Email</dt><dd data-answer="email"></dd></div><div><dt>Company</dt><dd data-answer="company"></dd></div><div><dt>Phone</dt><dd data-answer="phone"></dd></div><div class="wide"><dt>The project</dt><dd data-answer="brief"></dd></div></dl><div class="contact-actions"><button class="contact-back" type="button" data-contact-edit>Edit your answers</button>'+(window.LAIF_WOLICO?'<button class="cta" type="button" data-contact-send>Send to LAIF</button>':'')+'</div><p class="contact-send-status" role="status"></p>';
   content.innerHTML=body;
   if(step==='collaborazione'){
    const mount=content.querySelector('[data-careers]');
@@ -163,16 +163,16 @@ const mcpPanel=()=>'<p class="mcp-preview-state">MCP connector · Coming soon</p
  function close(){clearTimer();dialog.close()}
  dialog.querySelector('.contact-close').addEventListener('click',close);
  content.addEventListener('click',event=>{if(event.target.closest('[data-contact-quick]')){clearTimer();remember();rapid=true;step=3;render();return}if(event.target.closest('[data-contact-mcp]')){clearTimer();remember();mcpReturnStep=step;step='mcp';render();return}if(event.target.closest('[data-mcp-back]')){step=mcpReturnStep;render();content.querySelector('[data-contact-mcp]')?.focus();return}if(event.target.closest('[data-copy-prompt]')){const field=content.querySelector('#mcp-project-prompt'),status=content.querySelector('.mcp-copy-status');if(navigator.clipboard?.writeText)navigator.clipboard.writeText(field.value).then(()=>{status.textContent='Prompt copied. You can paste it into your chatbot.'}).catch(()=>{field.select();status.textContent='Select and copy the prompt.'});else{field.select();status.textContent='Select and copy the prompt.'}return}if(event.target.closest('[data-contact-close]'))close();if(event.target.closest('[data-contact-back]')){remember();step=rapid?0:Math.max(0,step-1);rapid=false;render()}if(event.target.closest('[data-contact-start]')){answers={};step=0;render()}if(event.target.closest('[data-contact-edit]')){step=3;render()}});
- dialog.addEventListener('close',()=>{clearTimer();answers={};content.replaceChildren();document.documentElement.classList.remove('contact-open');if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi')history.replaceState(null,'',location.pathname+location.search);opener?.focus({preventScroll:true})});
+ dialog.addEventListener('close',()=>{clearTimer();answers={};content.replaceChildren();document.documentElement.classList.remove('contact-open');if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi'||location.hash==='#raccontaci')history.replaceState(null,'',location.pathname+location.search);opener?.focus({preventScroll:true})});
  dialog.addEventListener('keydown',event=>{if((step===0||step===1)&&!['INPUT','TEXTAREA','BUTTON','A'].includes(event.target.tagName)&&/^[a-e]$/i.test(event.key)){const inputs=[...content.querySelectorAll('input[type="radio"]')],input=inputs[event.key.toLowerCase().charCodeAt(0)-97];if(input){event.preventDefault();input.click();next()}}});
  triggers.forEach(trigger=>{trigger.setAttribute('aria-haspopup','dialog');trigger.addEventListener('click',event=>{event.preventDefault();open(trigger)})});
- window.addEventListener('hashchange',()=>{if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi')open();else if(dialog.open)close()});
- if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi')open();
+ window.addEventListener('hashchange',()=>{if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi'||location.hash==='#raccontaci')open();else if(dialog.open)close()});
+ if(location.hash==='#parliamoci'||location.hash==='#lavora-con-noi'||location.hash==='#raccontaci')open();
 })();
 (() => {
   document.addEventListener('click', e => {
     const link = e.target.closest('[data-embed]');
-    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || !(window.LaifConsenso&&window.LaifConsenso.marketing())) return;
     e.preventDefault();
     const frame = document.createElement('iframe');
     frame.src = link.dataset.embed;
@@ -202,12 +202,12 @@ const mcpPanel=()=>'<p class="mcp-preview-state">MCP connector · Coming soon</p
  const frames=[...document.querySelectorAll('iframe[data-value-video]')];
  if(!frames.length)return;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const load=frame=>{if(frame.hasAttribute('src'))return;const url=new URL(frame.dataset.valueVideo);url.searchParams.set('autoplay',reduced.matches?'0':'1');frame.src=url.href};
+ const load=frame=>{if(frame.hasAttribute('src')||!(window.LaifConsenso&&window.LaifConsenso.marketing()))return;const url=new URL(frame.dataset.valueVideo);url.searchParams.set('autoplay',reduced.matches?'0':'1');frame.src=url.href};
  const stop=frame=>frame.removeAttribute('src');
  const containers=new Map(frames.map(frame=>[frame.closest('.value-row-media'),frame])),visible=new Set();
  if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>{const frame=containers.get(target);if(isIntersecting){visible.add(frame);if(!document.hidden)load(frame)}else{visible.delete(frame);stop(frame)}}),{threshold:.15});containers.forEach((frame,container)=>observer.observe(container))}else frames.forEach(frame=>{visible.add(frame);load(frame)});
  document.addEventListener('visibilitychange',()=>frames.forEach(frame=>{if(document.hidden)stop(frame);else if(visible.has(frame))load(frame)}));
- reduced.addEventListener('change',()=>frames.forEach(frame=>{stop(frame);if(visible.has(frame)&&!document.hidden)load(frame)}));
+ reduced.addEventListener('change',()=>frames.forEach(frame=>{stop(frame);if(visible.has(frame)&&!document.hidden)load(frame)}));document.addEventListener('laif:consenso',()=>frames.forEach(frame=>{if(visible.has(frame)&&!document.hidden)load(frame)}));
 })();
 
 /* One visual system: complexity becomes order, flow, then shared access. */
@@ -225,3 +225,22 @@ const mcpPanel=()=>'<p class="mcp-preview-state">MCP connector · Coming soon</p
  buttons.forEach(button=>button.addEventListener('click',()=>{if(!canPin())return;const top=document.querySelector('.site-header')?.offsetHeight||0,distance=section.offsetHeight-screen.offsetHeight;window.scrollTo({top:scrollY+section.getBoundingClientRect().top-top+distance*(Number(button.dataset.valueGo)+.5)/4,behavior:'smooth'})}));
  window.addEventListener('scroll',queue,{passive:true});window.addEventListener('resize',configure);reduced.addEventListener('change',configure);configure();
 })();
+
+/* Il riepilogo di «Parliamoci» si invia a Wolico (lead nel CRM), quando la pagina ha l'indirizzo di Wolico. */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-contact-send]');if(!b)return;
+ const box=b.closest('.contact-content'),en=document.documentElement.lang.startsWith('en');
+ const vuoto=en?'To be defined together':'Da definire insieme';
+ const v=k=>{const x=box.querySelector('[data-answer="'+k+'"]')?.textContent.trim()||'';return x===vuoto?'':x};
+ const dati=new FormData();
+ [['audience','per_chi'],['need','bisogno'],['name','nome'],['email','email'],['company','azienda'],['phone','telefono'],['brief','progetto']].forEach(([k,n])=>dati.append(n,v(k)));
+ dati.append('url',location.href.split('#')[0]);
+ const stato=box.querySelector('.contact-send-status');b.disabled=true;stato.textContent=en?'Sending…':'Invio…';
+ fetch((window.LAIF_WOLICO||'')+'/public/sito/contatti',{method:'POST',body:dati,credentials:'omit'})
+  .then(r=>r.json().catch(()=>({})).then(j=>{if(!r.ok||j.esito!=='ok')throw new Error(j.messaggio||'');
+   box.querySelectorAll('[data-contact-send],[data-contact-edit]').forEach(x=>x.remove());
+   box.querySelector('h2').textContent=en?'Request sent.':'Richiesta inviata.';
+   const sotto=box.querySelector('.contact-intro');if(sotto)sotto.textContent=en?'Your request reached the LAIF team.':'La tua richiesta è arrivata al team LAIF.';
+   stato.textContent=en?'The LAIF team will get back to you at '+v('email')+'.':'Il team LAIF ti ricontatterà a '+v('email')+'.'}))
+  .catch(err=>{b.disabled=false;stato.textContent=err.message||(en?'Sending failed: try again or write to info@laifgroup.com.':'Invio non riuscito: riprova o scrivi a info@laifgroup.com.')});
+});
