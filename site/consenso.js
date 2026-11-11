@@ -222,29 +222,53 @@
     return src.replace('/embed/feed/update/', '/feed/update/');
   }
 
+  // Il riquadro al posto di un contenuto di terze parti: dice chi lo ospita, chiede il consenso al marketing
+  // (registrato come «embed») oppure apre il contenuto sul sito originale.
+  function riquadro(servizio, esterno, dopo) {
+    var box = document.createElement('div');
+    box.className = 'consenso-incorporato';
+    var p = document.createElement('p');
+    p.textContent = T.embed.replace('{servizio}', servizio);
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'consenso-btn'; b.textContent = T.embedAccetta;
+    b.addEventListener('click', function () {
+      var ora = leggi();
+      salva({ statistiche: ora ? ora.s : false, marketing: true }, 'embed');
+      nascondiBanner();
+      if (dopo) dopo();
+    });
+    var a = document.createElement('a');
+    a.href = esterno; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = T.embedApri.replace('{servizio}', servizio);
+    box.append(p, b, a);
+    return box;
+  }
+
   function preparaIncorporati() {
     var c = leggi();
     document.querySelectorAll('iframe[data-consenso-src]').forEach(function (f) {
       if (c && c.m) { f.src = f.dataset.consensoSrc; return; }
       if (f.previousElementSibling && f.previousElementSibling.classList.contains('consenso-incorporato')) return;
-      var servizio = servizioDi(f.dataset.consensoSrc);
-      var box = document.createElement('div');
-      box.className = 'consenso-incorporato';
-      var p = document.createElement('p');
-      p.textContent = T.embed.replace('{servizio}', servizio);
-      var b = document.createElement('button');
-      b.type = 'button'; b.className = 'consenso-btn'; b.textContent = T.embedAccetta;
-      b.addEventListener('click', function () {
-        var ora = leggi();
-        salva({ statistiche: ora ? ora.s : false, marketing: true }, 'embed');
-        nascondiBanner();
-      });
-      var a = document.createElement('a');
-      a.href = linkEsterno(f.dataset.consensoSrc); a.target = '_blank'; a.rel = 'noopener';
-      a.textContent = T.embedApri.replace('{servizio}', servizio);
-      box.append(p, b, a);
-      f.parentNode.insertBefore(box, f);
+      f.parentNode.insertBefore(riquadro(servizioDi(f.dataset.consensoSrc), linkEsterno(f.dataset.consensoSrc)), f);
     });
+    // I video dei valori li carica script.js quando sono visibili, e solo col consenso: senza, il riquadro.
+    document.querySelectorAll('iframe[data-value-video]').forEach(function (f) {
+      if ((c && c.m) || (f.previousElementSibling && f.previousElementSibling.classList.contains('consenso-incorporato'))) return;
+      f.parentNode.insertBefore(riquadro('YouTube', linkEsterno(f.dataset.valueVideo)), f);
+    });
+  }
+
+  // «Guarda il video» senza consenso: il riquadro prende il posto dell'anteprima; accettato, il video parte lì.
+  function chiediVideo(link) {
+    if (link.previousElementSibling && link.previousElementSibling.classList.contains('consenso-incorporato')) return;
+    var box = riquadro('YouTube', link.href, function () {
+      box.remove(); link.style.display = '';
+      link.click();
+    });
+    box.classList.add('consenso-video');
+    link.parentNode.insertBefore(box, link);
+    link.style.display = 'none';
+    box.querySelector('button').focus();
   }
 
   function mostraIncorporati() {
@@ -378,7 +402,8 @@
     apri: apriPreferenze,
     stato: leggi,
     statistiche: function () { var c = leggi(); return !!(c && c.s); },
-    marketing: function () { var c = leggi(); return !!(c && c.m); }
+    marketing: function () { var c = leggi(); return !!(c && c.m); },
+    chiediVideo: chiediVideo
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia);
   else avvia();
